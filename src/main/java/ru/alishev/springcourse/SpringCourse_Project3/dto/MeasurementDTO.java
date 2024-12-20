@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import ru.alishev.springcourse.SpringCourse_Project3.models.Sensor;
 
 
-
 public class MeasurementDTO {
 
     @NotNull

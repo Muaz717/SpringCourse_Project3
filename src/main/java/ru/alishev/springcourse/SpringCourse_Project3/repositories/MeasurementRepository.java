@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.alishev.springcourse.SpringCourse_Project3.models.Measurement;
 
 @Repository
-public interface MeasurementsRepository extends JpaRepository<Measurement, Integer> {
+public interface MeasurementRepository extends JpaRepository<Measurement, Integer> {
 }

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.alishev.springcourse.SpringCourse_Project3.dto.MeasurementDTO;
 import ru.alishev.springcourse.SpringCourse_Project3.models.Measurement;
-import ru.alishev.springcourse.SpringCourse_Project3.services.MeasurementsService;
+import ru.alishev.springcourse.SpringCourse_Project3.services.MeasurementService;
+import ru.alishev.springcourse.SpringCourse_Project3.util.MeasurementValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,14 +21,16 @@ import static ru.alishev.springcourse.SpringCourse_Project3.util.ErrorsUtil.retu
 @RequestMapping("/measurements")
 public class MeasurementsController {
 
-    private final MeasurementsService measurementsService;
-//    private final Measure
+    private final MeasurementService measurementsService;
+    private final MeasurementValidator measurementValidator;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public MeasurementsController(MeasurementsService measurementsService, ModelMapper modelMapper) {
+    public MeasurementsController(MeasurementService measurementsService, ModelMapper modelMapper,
+                                  MeasurementValidator measurementValidator) {
         this.measurementsService = measurementsService;
         this.modelMapper = modelMapper;
+        this.measurementValidator = measurementValidator;
     }
 
     @GetMapping()
@@ -37,11 +39,18 @@ public class MeasurementsController {
                 collect(Collectors.toList());
     }
 
+    @GetMapping("/rainyDaysCount")
+    public long getRainyDaysCount() {
+        return measurementsService.findAll().stream().filter(Measurement::isRaining).count();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid MeasurementDTO measurementDTO,
                                              BindingResult bindingResult) {
 
         Measurement measurementToAdd = convertToMeasurement(measurementDTO);
+
+        measurementValidator.validate(measurementToAdd, bindingResult);
 
         if (bindingResult.hasErrors()) {
             returnErrorsToClient(bindingResult);
